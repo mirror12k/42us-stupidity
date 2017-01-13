@@ -90,3 +90,67 @@ check -e ====
 $expected = '2,10';
 ====
 
+
+ex05
+ft_putstr(char *str)
+main_basic ====
+int main()
+{
+	ft_putstr("hello world!");
+	return 0;
+}
+====
+check_basic -e ====
+$expected = 'hello world!';
+====
+main_multiple ====
+int main()
+{
+	ft_putstr("test1\n");
+	ft_putstr("test2\n");
+	ft_putstr("test3\n");
+	return 0;
+}
+====
+check_multiple -e ====
+$expected = "test1\ntest2\ntest3\n";
+====
+main_empty ====
+int main ()
+{
+	ft_putstr("");
+	ft_putstr("");
+	ft_putstr("");
+	return 0;
+}
+====
+check_empty -e ====
+$expected = '';
+====
+
+
+ex06
+int ft_strlen(char *str)
+main_basic ====
+int main()
+{
+	printf("%d,%d,%d", ft_strlen("asdf"), ft_strlen("qwerty"), ft_strlen("zxc0zxc"));
+	return 0;
+}
+====
+check_basic -e ====
+$expected = '4,6,7';
+====
+main_empty ====
+int main()
+{
+	printf("%d", ft_strlen(""));
+	return 0;
+}
+====
+check_empty -e ====
+$expected = '0';
+====
+
+
+
