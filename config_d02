@@ -7,9 +7,30 @@ int main()
 }
 ====
 check ====
-if ($output eq 'abcdefghijklmnopqrstuvwxyz') {
-	say "good";
-} else {
-	say "!!!! ERROR: $output";
+$expected = join '', 'a' .. 'z';
+if ($output eq $expected)
+====
+ex01
+ft_print_reverse_alphabet
+main ====
+int main()
+{
+	ft_print_reverse_alphabet();
 }
+====
+check ====
+$expected = join '', reverse 'a' .. 'z';
+if ($output eq $expected)
+====
+ex02
+ft_print_numbers
+main ====
+int main()
+{
+	ft_print_numbers();
+}
+====
+check ====
+$expected = join '', '0' .. '9';
+if ($output eq $expected)
 ====

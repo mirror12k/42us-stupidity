@@ -83,6 +83,7 @@ sub read_file_from_config {
 	while ($line ne $break) {
 		$result .= "$line\n";
 		$line = shift @$config;
+		die "end of file while looking for break: $break" unless defined $line;
 	}
 	return $result
 }
@@ -135,7 +136,7 @@ sub main {
 norminette -R CheckForbiddenSourceHeader work/$exercise/$function_name.c
 ");
 
-		while (@config and $config[0] =~ /\A(main\d*) (.*)\Z/) {
+		while (@config and $config[0] =~ /\A(main\w*) (.*)\Z/) {
 			shift @config;
 			my $main_file = $1;
 
@@ -145,7 +146,7 @@ norminette -R CheckForbiddenSourceHeader work/$exercise/$function_name.c
 echo building work/$exercise/$main_file
 gcc -Wall -Wextra -Werror stupidity.c work/$exercise/*.c -o work/$exercise/$main_file
 ");
-			next unless @config and $config[0] =~ /\A(check\d*) (.*)\Z/;
+			next unless @config and $config[0] =~ /\A(check\w*) (.*)\Z/;
 			shift @config;
 			my $check_file = "$1.pl";
 			dump_file("work/$exercise/$check_file", "#!/usr/bin/env perl\n
@@ -154,9 +155,14 @@ use warnings;
 use feature 'say';
 
 my \$output = `./work/$exercise/$main_file`;
-warn \"$exercise/$main_file failed to run: \$?\" if \$?;
-" . read_file_from_config(\@config, $2));
+my \$expected;
+die \"$exercise/$main_file failed to run: \$?\" if \$?;
+" . read_file_from_config(\@config, $2) . "
+{ say 'work/$exercise/$main_file good!'; }
+else { say \"!!!! ERROR in work/$exercise/$main_file: '\$output'\"; say \"!!!! EXPECTED: '\$expected'\" if defined \$expected; }
+");
 			append_file('tools/check_all.sh', "
+
 perl work/$exercise/$check_file
 ");
 		}
