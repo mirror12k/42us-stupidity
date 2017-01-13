@@ -146,13 +146,14 @@ norminette -R CheckForbiddenSourceHeader work/$exercise/$function_name.c
 echo building work/$exercise/$main_file
 gcc -Wall -Wextra -Werror stupidity.c work/$exercise/$function_name.c work/$exercise/$main_file.c -o work/$exercise/$main_file
 ");
-			next unless @config and $config[0] =~ /\A(check\w*)(?: (-\w(?: -\w)*))? (=.*=)\Z/;
-			shift @config;
-			my $check_file = "$1.pl";
-			my %flags;
-			%flags = map { $_ => 1 } map s/\A-//r, split ' ', $2 if defined $2;
-			my $break = $3;
-			dump_file("work/$exercise/$check_file", "#!/usr/bin/env perl
+			while (@config and $config[0] =~ /\A(check\w*)(?: (-\w(?: -\w)*))? (=.*=)\Z/)
+			{
+				shift @config;
+				my $check_file = "$1.pl";
+				my %flags;
+				%flags = map { $_ => 1 } map s/\A-//r, split ' ', $2 if defined $2;
+				my $break = $3;
+				dump_file("work/$exercise/$check_file", "#!/usr/bin/env perl
 use strict;
 use warnings;
 use feature 'say';
@@ -166,10 +167,10 @@ die \"$exercise/$main_file failed to run: \$?\" if \$?;
 { say 'work/$exercise/$main_file good!'; }
 else { say \"!!!! ERROR in work/$exercise/$main_file: '\$output'\"; say \"!!!! EXPECTED: '\$expected'\" if defined \$expected; }
 ");
-			append_file('tools/check_all.sh', "
-
+				append_file('tools/check_all.sh', "
 perl work/$exercise/$check_file
 ");
+			}
 		}
 	}
 
