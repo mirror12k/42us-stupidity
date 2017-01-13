@@ -1,0 +1,16 @@
+ex00
+ft_print_alphabet
+main ====
+int main()
+{
+	ft_print_alphabet();
+}
+====
+check ====
+my $output = `ex01/main`;
+if ($output eq 'abcdefghijklmnopqrstuvwxyz') {
+	say "good";
+} else {
+	say "!!!! ERROR: $output";
+}
+====
