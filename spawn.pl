@@ -136,7 +136,7 @@ sub main {
 norminette -R CheckForbiddenSourceHeader work/$exercise/$function_name.c
 ");
 
-		while (@config and $config[0] =~ /\A(main\w*) (.*)\Z/) {
+		while (@config and $config[0] =~ /\A(main\w*) (=.*=)\Z/) {
 			shift @config;
 			my $main_file = $1;
 
@@ -144,12 +144,15 @@ norminette -R CheckForbiddenSourceHeader work/$exercise/$function_name.c
 			dump_file("work/$exercise/$main_file.c", "#include <stdio.h>\n$import_proto;\n\n$contents");
 			append_file('tools/build.sh', "
 echo building work/$exercise/$main_file
-gcc -Wall -Wextra -Werror stupidity.c work/$exercise/*.c -o work/$exercise/$main_file
+gcc -Wall -Wextra -Werror stupidity.c work/$exercise/$function_name.c work/$exercise/$main_file.c -o work/$exercise/$main_file
 ");
-			next unless @config and $config[0] =~ /\A(check\w*) (.*)\Z/;
+			next unless @config and $config[0] =~ /\A(check\w*)(?: (-\w(?: -\w)*))? (=.*=)\Z/;
 			shift @config;
 			my $check_file = "$1.pl";
-			dump_file("work/$exercise/$check_file", "#!/usr/bin/env perl\n
+			my %flags;
+			%flags = map { $_ => 1 } map s/\A-//r, split ' ', $2 if defined $2;
+			my $break = $3;
+			dump_file("work/$exercise/$check_file", "#!/usr/bin/env perl
 use strict;
 use warnings;
 use feature 'say';
@@ -157,7 +160,9 @@ use feature 'say';
 my \$output = `./work/$exercise/$main_file`;
 my \$expected;
 die \"$exercise/$main_file failed to run: \$?\" if \$?;
-" . read_file_from_config(\@config, $2) . "
+" . read_file_from_config(\@config, $break)
+. ( $flags{e} ? "if (\$output eq \$expected)\n" : '' )
+. "
 { say 'work/$exercise/$main_file good!'; }
 else { say \"!!!! ERROR in work/$exercise/$main_file: '\$output'\"; say \"!!!! EXPECTED: '\$expected'\" if defined \$expected; }
 ");

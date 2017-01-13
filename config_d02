@@ -6,9 +6,8 @@ int main()
 	ft_print_alphabet();
 }
 ====
-check ====
+check -e ====
 $expected = join '', 'a' .. 'z';
-if ($output eq $expected)
 ====
 ex01
 ft_print_reverse_alphabet
@@ -18,9 +17,8 @@ int main()
 	ft_print_reverse_alphabet();
 }
 ====
-check ====
+check -e ====
 $expected = join '', reverse 'a' .. 'z';
-if ($output eq $expected)
 ====
 ex02
 ft_print_numbers
@@ -30,7 +28,44 @@ int main()
 	ft_print_numbers();
 }
 ====
-check ====
+check -e ====
 $expected = join '', '0' .. '9';
-if ($output eq $expected)
+====
+ex03
+ft_is_negative(int n)
+main_basic ====
+int main()
+{
+	ft_is_negative(15);
+	ft_is_negative(-25);
+	ft_is_negative(12345678);
+}
+====
+check_basic -e ====
+$expected = 'PNP';
+====
+main_zero ====
+int main ()
+{
+	ft_is_negative(0);
+}
+====
+check_zero -e ====
+$expected = 'P';
+====
+ex04
+ft_print_comb
+main ====
+int main()
+{
+	ft_print_comb();
+}
+====
+check -e ====
+$expected = join ', ',
+	grep {
+		my ($a, $b, $c) = split '', $_;
+		$a < $b and $b < $c;
+	}
+	'000' .. '999';
 ====
