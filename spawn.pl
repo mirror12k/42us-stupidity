@@ -20,7 +20,7 @@ sub slurp_file {
 sub dump_file {
 	my ($file, $contents) = @_;
 	
-	say "creating file $file";
+	# warn "creating file $file\n";
 
 	open my $f, '>', $file;
 	$f->print($contents);
@@ -30,7 +30,7 @@ sub dump_file {
 sub append_file {
 	my ($file, $contents) = @_;
 
-	say "appending file $file";
+	# warn "appending file $file\n";
 
 	open my $f, '>>', $file;
 	$f->print($contents);
@@ -106,10 +106,15 @@ sub main {
 	my @config = grep $_ ne '', split /\r?\n/, slurp_file($config_file);
 
 	while (@config) {
-		my $exercise = shift @config;
+		my $thing = shift @config;
+		if ($thing =~ /\A((?:check|main)\w*)(?: (-\w(?: -\w)*))? (=.*=)\Z/) {
+			(undef) = read_file_from_config(\@config, $3);
+			next;
+		}
+		my $exercise = $thing;
 		my $function = shift @config;
 
-		warn "preparing $exercise/$function\n";
+		warn "\npreparing $exercise/$function\n";
 
 		my ($function_name, $function_proto) = parse_function_ref($function);
 		
@@ -130,6 +135,7 @@ sub main {
 		
 		mkdir "work/$exercise";
 		
+		warn "mirroring into work/$exercise/$function.c\n";
 		mirror_file("$project_directory/$exercise/$function_name.c", "work/$exercise/$function_name.c");
 
 		append_file('tools/verify.sh', "
@@ -141,6 +147,7 @@ norminette -R CheckForbiddenSourceHeader work/$exercise/$function_name.c
 			my $main_file = $1;
 
 			my $contents = read_file_from_config(\@config, $2);
+			warn "$main_file at work/$exercise/$main_file.c\n";
 			dump_file("work/$exercise/$main_file.c", "#include <stdio.h>\n$import_proto;\n\n$contents");
 			append_file('tools/build.sh', "
 echo building work/$exercise/$main_file
@@ -153,6 +160,7 @@ gcc -Wall -Wextra -Werror stupidity.c work/$exercise/$function_name.c work/$exer
 				my %flags;
 				%flags = map { $_ => 1 } map s/\A-//r, split ' ', $2 if defined $2;
 				my $break = $3;
+				warn "$check_file at work/$exercise/$check_file\n";
 				dump_file("work/$exercise/$check_file", "#!/usr/bin/env perl
 use strict;
 use warnings;
