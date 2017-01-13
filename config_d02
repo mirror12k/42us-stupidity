@@ -7,7 +7,6 @@ int main()
 }
 ====
 check ====
-my $output = `ex01/main`;
 if ($output eq 'abcdefghijklmnopqrstuvwxyz') {
 	say "good";
 } else {

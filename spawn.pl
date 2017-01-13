@@ -40,7 +40,7 @@ sub append_file {
 sub mirror_file {
 	my ($file, $destination) = @_;
 	my $contents = slurp_file($file);
-	dump_file($contents);
+	dump_file($destination, $contents);
 }
 
 sub get_given_function_prototype {
@@ -93,9 +93,14 @@ sub main {
 	die "project_directory required" unless defined $project_directory;
 	die "config file required" unless defined $config_file;
 
-	dump_file('build.sh', "#!/bin/sh\n\n");
-	dump_file('verify.sh', "#!/bin/sh\n\n");
-	dump_file('check_all.sh', "#!/bin/sh\n\n");
+	mkdir 'tools';
+	mkdir 'work';
+
+	dump_file('tools/build.sh', "#!/bin/sh\n\n");
+	dump_file('tools/verify.sh', "#!/bin/sh\n\n");
+	dump_file('tools/check_all.sh', "#!/bin/sh\n\n");
+
+	chmod 0755, 'tools/build.sh', 'tools/verify.sh', 'tools/check_all.sh';
 
 	my @config = grep $_ ne '', split /\r?\n/, slurp_file($config_file);
 
@@ -122,30 +127,37 @@ sub main {
 			next;
 		}
 		
-		mkdir $exercise;
+		mkdir "work/$exercise";
 		
-		mirror_file("$project_directory/$exercise/$function_name.c", "$exercise/$function_name.c");
+		mirror_file("$project_directory/$exercise/$function_name.c", "work/$exercise/$function_name.c");
 
-		append_file('verify.sh', "
-norminette -R CheckForbiddenSourceHeader $exercise/$function_name.c
+		append_file('tools/verify.sh', "
+norminette -R CheckForbiddenSourceHeader work/$exercise/$function_name.c
 ");
 
-		while (@config and @config[0] =~ /\A(main\d*) (.*)\Z/) {
+		while (@config and $config[0] =~ /\A(main\d*) (.*)\Z/) {
 			shift @config;
 			my $main_file = $1;
 
 			my $contents = read_file_from_config(\@config, $2);
-			dump_file("$exercise/$main_file.c", "#include <stdio.h>\n$import_proto;\n\n$contents");
-			append_file('build.sh', "
-echo building $exercise/$main_file
-gcc -Wall -Wextra -Werror stupidity.c $exercise/*.c -o $exercise/$main_file
+			dump_file("work/$exercise/$main_file.c", "#include <stdio.h>\n$import_proto;\n\n$contents");
+			append_file('tools/build.sh', "
+echo building work/$exercise/$main_file
+gcc -Wall -Wextra -Werror stupidity.c work/$exercise/*.c -o work/$exercise/$main_file
 ");
-			next unless @config and @config[0] =~ /\A(check\d*) (.*)\Z/;
+			next unless @config and $config[0] =~ /\A(check\d*) (.*)\Z/;
 			shift @config;
 			my $check_file = "$1.pl";
-			dump_file("$exercise/$check_file", "use strict;\nuse warnings;\nuse feature 'say';\n\n" . read_file_from_config(\@config, $2));
-			append_file('check_all.sh', "
-perl $exercise/$check_file
+			dump_file("work/$exercise/$check_file", "#!/usr/bin/env perl\n
+use strict;
+use warnings;
+use feature 'say';
+
+my \$output = `./work/$exercise/$main_file`;
+warn \"$exercise/$main_file failed to run: \$?\" if \$?;
+" . read_file_from_config(\@config, $2));
+			append_file('tools/check_all.sh', "
+perl work/$exercise/$check_file
 ");
 		}
 	}
