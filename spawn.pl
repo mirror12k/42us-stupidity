@@ -135,7 +135,7 @@ sub main {
 		
 		mkdir "work/$exercise";
 		
-		warn "mirroring into work/$exercise/$function.c\n";
+		warn "mirroring into work/$exercise/$function_name.c\n";
 		mirror_file("$project_directory/$exercise/$function_name.c", "work/$exercise/$function_name.c");
 
 		append_file('tools/verify.sh', "
