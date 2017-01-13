@@ -81,6 +81,22 @@ $expected = join ', ',
 	}
 	'000' .. '999';
 ====
+main_multiple ====
+int main ()
+{
+	ft_print_comb();
+	ft_print_comb();
+}
+====
+check_multiple -e ====
+$expected = join ', ',
+	grep {
+		my ($a, $b, $c) = split '', $_;
+		$a < $b and $b < $c;
+	}
+	'000' .. '999';
+$expected = "$expected$expected";
+====
 
 
 
@@ -101,6 +117,24 @@ $expected = join ', ',
 		map { [$first, $_] } '00' .. '99'
 	}
 	'00' .. '99';
+====
+main_multiple ====
+int main ()
+{
+	ft_print_comb2();
+	ft_print_comb2();
+}
+====
+check_multiple -e ====
+$expected = join ', ',
+	map { "$_->[0] $_->[1]" }
+	grep { $_->[0] < $_->[1] }
+	map {
+		my $first = $_;
+		map { [$first, $_] } '00' .. '99'
+	}
+	'00' .. '99';
+$expected = "$expected$expected";
 ====
 
 
@@ -193,4 +227,22 @@ $expected = join ', ',
 		$a < $b and $b < $c
 	}
 	'000' .. '999';
+====
+main_comb_multiple ====
+int main ()
+{
+	ft_print_combn(1);
+	ft_print_combn(2);
+	ft_print_combn(1);
+}
+====
+check_comb_multiple -e ====
+$expected = join ', ', '0' .. '9';
+$expected .= join ', ',
+	grep {
+		my ($a, $b) = split '', $_;
+		$a < $b
+	}
+	'00' .. '99';
+$expected .= join ', ', '0' .. '9';
 ====
