@@ -199,6 +199,8 @@ foreach my \$line (grep / -> [01]\\Z/, split /\\n/, \$output) {
 		say \"!!!! ERROR in work/$exercise/$main_file (line \$count_lines): '\$line'\";
 		\$errors++;
 	}
+	# debug
+	# else { say \"passing: '\$line'\"; }
 }
 if (\$count_lines < $check_flags{l}) {
 	say \"!!!! ERROR in work/$exercise/$main_file: expected $check_flags{l} lines, got \$count_lines\";
