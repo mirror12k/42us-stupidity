@@ -49,7 +49,6 @@ sub get_given_function_prototype {
 	my @protos = split /\r?\n/, $content;
 	foreach my $proto (@protos) {
 		if ($proto =~ /\A\S+\s+\**(\w+)\(.*\);?\Z/) {
-			say "found proto $1 while looking for $function";
 			return $proto if $1 eq $function;
 		}
 	}
@@ -79,14 +78,26 @@ sub parse_function_ref {
 
 sub read_file_from_config {
 	my ($config, $break) = @_;
+	$break = quotemeta $break;
 	my $result = '';
-	my $line = shift @$config;
-	while ($line ne $break) {
-		$result .= "$line\n";
-		$line = shift @$config;
-		die "end of file while looking for break: $break" unless defined $line;
+	until ($config->[0] =~ /\A$break(?:\s+(.+))?\Z/) {
+		die "end of file while looking for break: $break" unless @$config;
+		$result .= shift @$config;
+		$result .= "\n";
 	}
+
+	if ($config->[0] =~ /\A$break(?:\s+(.+))\Z/) {
+		$config->[0] = $1;
+	} else {
+		shift @$config;
+	}
+
 	return $result
+}
+
+sub parse_flags {
+	my ($flags) = @_;
+	return map { $_ => 1 } map s/\A-//r, split ' ', $flags
 }
 
 sub main {
@@ -99,7 +110,7 @@ sub main {
 	mkdir 'work';
 
 	dump_file('tools/build.sh', "#!/bin/sh\n\n");
-	dump_file('tools/verify.sh', "#!/bin/sh\n\n");
+	dump_file('tools/verify.sh', "#!/bin/sh\n\n norminette -R CheckForbiddenSourceHeader");
 	dump_file('tools/check_all.sh', "#!/bin/sh\n\n");
 
 	chmod 0755, 'tools/build.sh', 'tools/verify.sh', 'tools/check_all.sh';
@@ -139,17 +150,24 @@ sub main {
 		warn "mirroring into work/$exercise/$function_name.c\n";
 		mirror_file("$project_directory/$exercise/$function_name.c", "work/$exercise/$function_name.c");
 
-		append_file('tools/verify.sh', "
-norminette -R CheckForbiddenSourceHeader work/$exercise/$function_name.c
-");
+		append_file('tools/verify.sh', " work/$exercise/$function_name.c");
 
-		while (@config and $config[0] =~ /\A(main\w*) (=.*=)\Z/) {
+		while (@config and $config[0] =~ /\A(main\w*)(?: (-\w(?: -\w)*))? (=.*=)\Z/) {
 			shift @config;
 			my $main_file = $1;
-
-			my $contents = read_file_from_config(\@config, $2);
+			my %main_flags;
+			%main_flags = parse_flags($2) if defined $2;
+			my $contents = read_file_from_config(\@config, $3);
 			warn "$main_file at work/$exercise/$main_file.c\n";
-			dump_file("work/$exercise/$main_file.c", "#include <stdio.h>\n$import_proto;\n\n$contents");
+
+			my $prefix = "#include <stdio.h>\n$import_proto;\n\n";
+			my $suffix = "\n\n";
+
+			if ($main_flags{m}) {
+				$prefix .= "int main() {\n";
+				$suffix .= "return 0; }\n";
+			}
+			dump_file("work/$exercise/$main_file.c", "$prefix$contents$suffix");
 			append_file('tools/build.sh', "
 echo building work/$exercise/$main_file
 gcc -Wall -Wextra -Werror stupidity.c work/$exercise/$function_name.c work/$exercise/$main_file.c -o work/$exercise/$main_file
@@ -158,8 +176,8 @@ gcc -Wall -Wextra -Werror stupidity.c work/$exercise/$function_name.c work/$exer
 			{
 				shift @config;
 				my $check_file = "$1.pl";
-				my %flags;
-				%flags = map { $_ => 1 } map s/\A-//r, split ' ', $2 if defined $2;
+				my %check_flags;
+				%check_flags = parse_flags($2) if defined $2;
 				my $break = $3;
 				warn "$check_file at work/$exercise/$check_file\n";
 				dump_file("work/$exercise/$check_file", "#!/usr/bin/env perl
@@ -171,7 +189,7 @@ my \$output = `./work/$exercise/$main_file`;
 my \$expected;
 die \"$exercise/$main_file failed to run: \$?\" if \$?;
 " . read_file_from_config(\@config, $break)
-. ( $flags{e} ? "if (\$output eq \$expected)\n" : '' )
+. ( $check_flags{e} ? "if (\$output eq \$expected)\n" : '' )
 . "
 { say 'work/$exercise/$main_file good!'; }
 else { say \"!!!! ERROR in work/$exercise/$main_file: '\$output'\"; say \"!!!! EXPECTED: '\$expected'\" if defined \$expected; }
