@@ -98,7 +98,26 @@ printf("2^1000000 (%d vs %d) -> %d\n", res, exp, 1);
 ====
 
 
+ex04
+int ft_fibonacci(int index)
+main -m ====
+printf("%d,%d,%d,%d, %d,%d,%d,%d, %d,%d,%d,%d",
+	ft_fibonacci(0),
+	ft_fibonacci(1),
+	ft_fibonacci(2),
+	ft_fibonacci(3),
 
+	ft_fibonacci(4),
+	ft_fibonacci(5),
+	ft_fibonacci(6),
+	ft_fibonacci(7),
 
+	ft_fibonacci(8),
+	ft_fibonacci(9),
+	ft_fibonacci(10),
+	ft_fibonacci(11));
+==== check -e ====
+$expected = '0,1,1,2, 3,5,8,13, 21,34,55,89';
+====
 
 
