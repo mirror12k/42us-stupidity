@@ -125,7 +125,7 @@ sub main {
 
 	while (@config) {
 		my $thing = shift @config;
-		if ($thing =~ /\A((?:check|main)\w*)(?: (-\w(?: -\w)*))? (=.*=)\Z/) {
+		if ($thing =~ /\A((?:main|check)\w*)(?: (-\w(?:=\S+)?(?: -\w(?:=\S+)?)*))? (=.*=)\Z/) {
 			(undef) = read_file_from_config(\@config, $3);
 			next;
 		}
