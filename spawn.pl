@@ -169,6 +169,11 @@ sub main {
 			my $prefix = "#include <stdio.h>\n$import_proto;\n\n";
 			my $suffix = "\n\n";
 
+			if ($main_flags{p}) {
+				$contents = eval $contents;
+				die "error compiling main -p: $@" if $@;
+			}
+
 			if ($main_flags{m}) {
 				$prefix .= "int main() {\n";
 				$suffix .= "return 0; }\n";
