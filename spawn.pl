@@ -48,7 +48,8 @@ sub get_given_function_prototype {
 
 	my @protos = split /\r?\n/, $content;
 	foreach my $proto (@protos) {
-		if ($proto =~ /\A\S+\s+(\w+)\(.*\);?\Z/) {
+		if ($proto =~ /\A\S+\s+\**(\w+)\(.*\);?\Z/) {
+			say "found proto $1 while looking for $function";
 			return $proto if $1 eq $function;
 		}
 	}
