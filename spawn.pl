@@ -97,7 +97,13 @@ sub read_file_from_config {
 
 sub parse_flags {
 	my ($flags) = @_;
-	return map { $_ => 1 } map s/\A-//r, split ' ', $flags
+	return map {
+			if (/\A(\w)=(.*)\Z/) {
+				$1 => $2
+			} else {
+				$_ => 1
+			}
+		} map s/\A-//r, split ' ', $flags
 }
 
 sub main {
@@ -152,7 +158,7 @@ sub main {
 
 		append_file('tools/verify.sh', " work/$exercise/$function_name.c");
 
-		while (@config and $config[0] =~ /\A(main\w*)(?: (-\w(?: -\w)*))? (=.*=)\Z/) {
+		while (@config and $config[0] =~ /\A(main\w*)(?: (-\w(?:=\S+)?(?: -\w(?:=\S+)?)*))? (=.*=)\Z/) {
 			shift @config;
 			my $main_file = $1;
 			my %main_flags;
@@ -172,7 +178,7 @@ sub main {
 echo building work/$exercise/$main_file
 gcc -Wall -Wextra -Werror stupidity.c work/$exercise/$function_name.c work/$exercise/$main_file.c -o work/$exercise/$main_file
 ");
-			while (@config and $config[0] =~ /\A(check\w*)(?: (-\w(?: -\w)*))? (=.*=)\Z/)
+			while (@config and $config[0] =~ /\A(check\w*)(?: (-\w(?:=\S+)?(?: -\w(?:=\S+)?)*))? (=.*=)\Z/)
 			{
 				shift @config;
 				my $check_file = "$1.pl";
@@ -180,6 +186,35 @@ gcc -Wall -Wextra -Werror stupidity.c work/$exercise/$function_name.c work/$exer
 				%check_flags = parse_flags($2) if defined $2;
 				my $break = $3;
 				warn "$check_file at work/$exercise/$check_file\n";
+				
+				my $prefix = "\n\n";
+				my $suffix = "\n\n";
+				my $contents = read_file_from_config(\@config, $break);
+				$prefix .= "
+my \$count_lines = 0;
+my \$errors = 0;
+foreach my \$line (grep / -> [01]\\Z/, split /\\n/, \$output) {
+	\$count_lines++;
+	if (\$line !~ / -> 1\\Z/) {
+		say \"!!!! ERROR in work/$exercise/$main_file (line \$count_lines): '\$line'\";
+		\$errors++;
+	}
+}
+if (\$count_lines < $check_flags{l}) {
+	say \"!!!! ERROR in work/$exercise/$main_file: expected $check_flags{l} lines, got \$count_lines\";
+} elsif (\$errors == 0) {
+	say 'work/$exercise/$main_file good!';
+}
+" if $check_flags{l};
+				$suffix .= "
+if (\$output eq \$expected) {
+	say 'work/$exercise/$main_file good!';
+} else {
+	say \"!!!! ERROR in work/$exercise/$main_file: '\$output'\";
+	say \"!!!! EXPECTED: '\$expected'\" if defined \$expected;
+}
+" if $check_flags{e};
+				
 				dump_file("work/$exercise/$check_file", "#!/usr/bin/env perl
 use strict;
 use warnings;
@@ -188,11 +223,10 @@ use feature 'say';
 my \$output = `./work/$exercise/$main_file`;
 my \$expected;
 die \"$exercise/$main_file failed to run: \$?\" if \$?;
-" . read_file_from_config(\@config, $break)
-. ( $check_flags{e} ? "if (\$output eq \$expected)\n" : '' )
-. "
-{ say 'work/$exercise/$main_file good!'; }
-else { say \"!!!! ERROR in work/$exercise/$main_file: '\$output'\"; say \"!!!! EXPECTED: '\$expected'\" if defined \$expected; }
+
+$prefix
+$contents
+$suffix
 ");
 				append_file('tools/check_all.sh', "
 perl work/$exercise/$check_file
