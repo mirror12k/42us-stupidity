@@ -207,7 +207,12 @@ return $code
 
 
 
-
-
+ex08
+int ft_eight_queens_puzzle(void)
+main -m ====
+printf("%d", ft_eight_queens_puzzle());
+==== check -e ====
+$expected = '92';
+====
 
 
