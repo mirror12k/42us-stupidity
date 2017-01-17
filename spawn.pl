@@ -177,7 +177,7 @@ $import_proto;
 			my $suffix = "\n\n";
 
 			if ($main_flags{p}) {
-				$contents = eval $contents;
+				$contents = eval "my \$code = ''; $contents; return \$code";
 				die "error compiling main -p: $@" if $@;
 			}
 

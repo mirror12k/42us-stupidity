@@ -37,13 +37,12 @@ $expected = '-2147483648';
 ex02
 int ft_atoi(char *str)
 main -p -m ====
-my $code = 'int res; int exp;';
+$code = 'int res; int exp;';
 my @tests = qw/ 0 15 -25 12345 987654321 -34567 2147483647 -2147483648 /;
 foreach (@tests) {
 	$code .= "res = ft_atoi(\"$_\"), exp = $_;\n";
 	$code .= "printf(\"ft_atoi('$_') ($_ vs %d) -> %d\\n\", res, res == exp);\n";
 }
-return $code;
 ==== check -l=6 ====
 ====
 
@@ -62,31 +61,100 @@ $expected = "qwerty\nhell0\n";
 
 ex04
 char* ft_strncpy(char* dest, unsigned int n)
+main -m ====
+char test1[256] = "asdf";
+printf("%s\n", ft_strncpy(test1, "uiop", 5));
+printf("%s\n", ft_strncpy(test1, "qwerty", 4));
+printf("%s\n", ft_strncpy(test1, "z", 1));
+==== check -e ====
+$expected = "uiop\nqwer\nzwer\n";
+====
 
 
 ex05
 char* ft_strstr(char* str, char* to_find)
+main -m ====
+printf("%s\n", ft_strstr("asdf qwerty", "wer"));
+printf("%s\n", ft_strstr("asdf qwerty qwerty", "wer"));
+printf("%s\n", ft_strstr("asdf qwerty", "qwerty1"));
+printf("%s\n", ft_strstr("", "wer"));
+printf("%s\n", ft_strstr("asdf qwerty", "zxcv"));
+printf("%s\n", ft_strstr("asdf qwerty", ""));
+==== check -e ====
+$expected = "werty\nwerty qwerty\n(null)\n(null)\n(null)\nasdf qwerty\n";
+====
 
 
 ex06
 int ft_strcmp(char* s1, char* s2)
+main -p -m ====
+my %tests = (
+	asdf_asdf => 0,
+	asde_asdf => -1,
+	asdg_asdf => 1,
+	_ => 0,
+	A_ => 0x41,
+	_A => -0x41,
+);
+
+$code = 'int exp, res;';
+foreach (sort keys %tests) {
+	my ($left, $right) = split '_', $_;
+	$code .= "res = ft_strcmp(\"$left\", \"$right\"), exp = $tests{$_};\n";
+	$code .= "printf(\"ft_strcmp('$left', '$right') (%d vs %d) -> %d\\n\", exp, res, res == exp);\n";
+}
+==== check -l=6 ====
+====
 
 
 ex07
 int ft_strncmp(char* s1, char* s2, unsigned int n)
+main -p -m ====
+my %tests = (
+	asdf_asdf_4 => 0,
+	asde_asdf_4 => -1,
+	asdg_asdf_4 => 1,
+	asdf_asdf_3 => 0,
+	asde_asdf_3 => 0,
+	__0 => 0,
+);
+$code = 'int res, exp;';
+foreach (sort keys %tests) {
+	my ($left, $right, $len) = split _ => $_;
+	$code .= "res = ft_strncmp(\"$left\", \"$right\", $len), exp = $tests{$_};\n";
+	$code .= "printf(\"ft_strncmp('$left', '$right', $len) (%d vs %d) -> %d\\n\", exp, res, res == exp);\n";
+}
+==== check -l=6 ====
+====
 
 
 ex08
 char* ft_strupcase(char* str)
+main -m ====
+char str[] = "asdf qWeRtY ZXCV";
+printf("%s", ft_strupcase(str));
+==== check -e ====
+$expected = 'ASDF QWERTY ZXCV';
+====
 
 
 ex09
 char* ft_strlowcase(char* str)
-
+main -m ====
+char str[] = "asdf qWeRtY ZXCV";
+printf("%s", ft_strlowcase(str));
+==== check -e ====
+$expected = 'asdf qwerty zxcv';
+====
 
 ex10
 char* ft_strcapitalize(char* str)
-
+main -m ====
+char str[] = "asdf qWeRtY ZXCV 100TIS";
+printf("%s", ft_strcapitalize(str));
+==== check -e ====
+$expected = 'Asdf Qwerty Zxcv 100tis';
+====
 
 ex11
 int ft_str_is_alpha(char* str)
