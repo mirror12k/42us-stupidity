@@ -158,6 +158,18 @@ $expected = 'Asdf Qwerty Zxcv 100tis';
 
 ex11
 int ft_str_is_alpha(char* str)
+main -p -m ====
+my %tests = (
+	asdf => 1,
+	QWERTY => 1,
+	asdf1234 => 0,
+	'999' => 0,
+	'' => 1,
+);
+$code = join '', map "TEST(ft_str_is_alpha(\"$_\"), $tests{$_});\n", sort keys %tests;
+#$code = join '', map "printf(\"$_ ($tests{$_} vs %d) -> %d\\n\", ft_str_is_alpha(\"$_\"), ft_str_is_alpha(\"$_\") == $tests{$_});\n", sort keys %tests;
+==== check -l=5 ====
+====
 
 
 ex12
