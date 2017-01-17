@@ -177,7 +177,7 @@ printf("prime 61? (%d vs %d) -> %d\n", res, exp, res == exp);
 ex07
 int ft_find_next_prime(int nb)
 main -p -m ====
-my $code = "int res, exp;\n";
+$code = "int res, exp;\n";
 
 my %tests = (
 	-2 => 2,
@@ -200,8 +200,6 @@ foreach my $arg (sort keys %tests) {
 	$code .= "res = ft_find_next_prime($arg), exp = $tests{$arg};\n";
 	$code .= "printf(\"next($arg) ($tests{$arg} vs %d) -> %d\\n\", res, res == exp);\n";
 }
-
-return $code
 ==== check -l=12 ====
 ====
 

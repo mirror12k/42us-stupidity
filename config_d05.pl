@@ -167,25 +167,71 @@ my %tests = (
 	'' => 1,
 );
 $code = join '', map "TEST(ft_str_is_alpha(\"$_\"), $tests{$_});\n", sort keys %tests;
-#$code = join '', map "printf(\"$_ ($tests{$_} vs %d) -> %d\\n\", ft_str_is_alpha(\"$_\"), ft_str_is_alpha(\"$_\") == $tests{$_});\n", sort keys %tests;
 ==== check -l=5 ====
 ====
 
 
 ex12
 int ft_str_is_numeric(char* str)
+main -p -m ====
+my %tests = (
+	123456 => 1,
+	asdf1234 => 0,
+	0 => 1,
+	'' => 1,
+	'12345asdf' => 0,
+);
+$code = join '', map "TEST(ft_str_is_numeric(\"$_\"), $tests{$_});\n", sort keys %tests;
+==== check -l=5 ====
+====
 
 
 ex13
 int ft_str_is_lowercase(char* str)
+main -p -m ====
+my %tests = (
+	asdf => 1,
+	asdF => 0,
+	ASDF => 0,
+	1234 => 0,
+	'' => 1,
+);
+$code = join '', map "TEST(ft_str_is_lowercase(\"$_\"), $tests{$_});\n", sort keys %tests;
+==== check -l=5 ====
+====
 
 
 ex14
 int ft_str_is_uppercase(char* str)
+main -p -m ====
+my %tests = (
+	ASDF => 1,
+	ASDf => 0,
+	asdf => 0,
+	1234 => 0,
+	'' => 1,
+);
+$code = join '', map "TEST(ft_str_is_uppercase(\"$_\"), $tests{$_});\n", sort keys %tests;
+==== check -l=5 ====
+====
 
 
 ex15
 int ft_str_is_printable(char* str)
+main -p -m ====
+my %tests = (
+	asdf => 1,
+	1234 => 1,
+	ASDF => 1,
+	'!@#$^&*()_+-=[]{}:;,./<>?' => 1,
+	"\\xf0" => 0,
+	"\\x7f" => 0,
+	"\\n" => 0,
+	'' => 1,
+);
+$code = join '', map "TEST(ft_str_is_printable(\"$_\"), $tests{$_});\n", sort keys %tests;
+==== check -l=8 ====
+====
 
 
 ex16
