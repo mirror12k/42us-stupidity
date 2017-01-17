@@ -166,7 +166,14 @@ sub main {
 			my $contents = read_file_from_config(\@config, $3);
 			warn "$main_file at work/$exercise/$main_file.c\n";
 
-			my $prefix = "#include <stdio.h>\n$import_proto;\n\n";
+			my $prefix = "
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+$import_proto;
+
+";
 			my $suffix = "\n\n";
 
 			if ($main_flags{p}) {
