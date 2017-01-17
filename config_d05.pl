@@ -236,35 +236,137 @@ $code = join '', map "TEST(ft_str_is_printable(\"$_\"), $tests{$_});\n", sort ke
 
 ex16
 char* ft_strcat(char* dest, char* src)
+main -m ====
+char test[256] = "";
+printf("%s\n", ft_strcat(test, "asdf"));
+printf("%s\n", ft_strcat(test, ""));
+printf("%s\n", ft_strcat(test, "zxcv"));
+==== check -e ====
+$expected = "asdf\nasdf\nasdfzxcv\n";
+====
 
 
 ex17
 char* ft_strncat(char* dest, char* src, int nb)
+main -m ====
+char test[256] = "\0zxcvzxcvzxcvxzcvzxcvzxcv";
+printf("%s\n", ft_strncat(test, "asdf", 16));
+printf("%s\n", ft_strncat(test, "", 16));
+printf("%s\n", ft_strncat(test, "qwerty", 0));
+printf("%s\n", ft_strncat(test, "asdf", 3));
+==== check -e ====
+$expected = "asdf\nasdf\nasdf\nasdfasd\n";
+====
 
 
 ex18
 unsigned int ft_strlcat(char* dest, char* src, unsigned int size)
+main -m ====
+char test[256] = "\0zxcvzxcvzxcvxzcvzxcv";
+printf("%d-", ft_strlcat(test, "asdf", 16));
+printf("%s\n", test);
+printf("%d-", ft_strlcat(test, "asdf", 6));
+printf("%s\n", test);
+printf("%d-", ft_strlcat(test, "asdf", 4));
+printf("%s\n", test);
+printf("%d-", ft_strlcat(test, "", 16));
+printf("%s\n", test);
+printf("%d-", ft_strlcat(test, "asdf", 0));
+printf("%s\n", test);
+==== check -e ====
+$expected = "4-asdf\n8-asdfa\n8-asdfa\n5-asdfa\n4-asdfa\n";
+====
 
 
 ex19
 unsigned int ft_strlcpy(char* dest, char* src, unsigned int size)
+main -m ====
+char test[256] = "\0zxcvzxcvzxcvxzcvzxcv";
+printf("%d-", ft_strlcpy(test, "asdf", 16));
+printf("%s\n", test);
+printf("%d-", ft_strlcpy(test, "uiop", 0));
+printf("%s\n", test);
+printf("%d-", ft_strlcpy(test, "qwerty", 4));
+printf("%s\n", test);
+printf("%d-", ft_strlcpy(test, "", 4));
+printf("%s\n", test);
+
+==== check -e ====
+$expected = "4-asdf\n4-asdf\n6-qwe\n0-\n";
+====
+
 
 
 ex20
 ft_putnbr_base(int nbr, char* base)
+main_basic -m ====
+ft_putnbr_base(40, "0123456789abcdef");
+==== check_basic -e ====
+$expected = "28";
+==== main_basic2 -m ====
+ft_putnbr_base(31, "0123456789abcdef");
+==== check_basic2 -e ====
+$expected = "1f";
+==== main_binary -m ====
+ft_putnbr_base(15, "01");
+==== check_binary -e ====
+$expected = '1111';
+==== main_negative -m ====
+ft_putnbr_base(-15, "0123456789");
+ft_putnbr_base(-16, "01");
+==== check_negative -e ====
+$expected = '-15-10000';
+==== main_intmax -m ====
+ft_putnbr_base(2147483647, "0123456789abcdef");
+ft_putnbr_base(-2147483648, "0123456789abcdef");
+==== check_intmax -e ====
+$expected = '7fffffff-80000000';
+====
 
 
 ex21
 int ft_atoi_base(char* str, char* base)
+main -p -m ====
+my %tests = (
+	_15_0123456789 => 15,
+	_3f_0123456789abcdef => 63,
+	_a_0a => 1,
+	'_-15_0123456789' => -15,
+	'_-111_01' => -7,
+
+	_a_0 => 0,
+	_1_012341234 => 0,
+	'_1_01234+' => 0,
+	_5_01234 => 0,
+	__01234 => 0,
+);
+foreach (sort keys %tests) {
+	my (undef, $str, $base) = split '_';
+	$code .= "TEST(ft_atoi_base(\"$str\", \"$base\"), $tests{$_});\n";
+}
+==== check -l=10 ====
+====
 
 
 ex22
 ft_putstr_non_printable(char* str)
+main -m ====
+ft_putstr_non_printable("asdf\x7f\x1fhi\x01\xfflol");
+==== check -e ====
+$expected = 'asdf\\7f\\1fhi\\01\\fflol';
+====
 
 
 ex23
 void* ft_print_memory(void* addr, unsigned int size)
-
+main -m ====
+ft_print_memory("asdfasdfqwertytyzxcvzxcv\0\0\xff\x7f\x01", 29);
+==== check -e ====
+$expected = 
+'00000000: 6173 6466 6173 6466 7177 6572 7479 7479 asdfasdfqwertyty
+00000010: 7a78 6376 7a78 6376 0000 ff7f 01        zxcvzxcv.....
+';
+====
 
 
 
