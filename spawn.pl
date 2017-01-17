@@ -132,6 +132,90 @@ sub main {
 		my $exercise = $thing;
 		my $function = shift @config;
 
+		if ($exercise =~ /\A(\S+) -p\Z/) {
+			$exercise = $1;
+			my $program_name = $function;
+			
+			warn "\npreparing $exercise/$program_name\n";
+
+			unless (-e -d "$project_directory/$exercise") {
+				warn "missing directory $project_directory/$exercise, skipping...";
+				next;
+			}
+			unless (-e -f "$project_directory/$exercise/$program_name.c") {
+				warn "missing project file $project_directory/$exercise/$program_name.c, skipping...";
+				next;
+			}
+			
+			mkdir "work/$exercise";
+			
+			mirror_file("$project_directory/$exercise/$program_name.c", "work/$exercise/$program_name.c");
+			
+			append_file('tools/verify.sh', " work/$exercise/$program_name.c");
+			append_file('tools/build.sh', "
+				echo building work/$exercise/$program_name
+				gcc -Wall -Wextra -Werror stupidity.c work/$exercise/$program_name.c -o work/$exercise/$program_name
+			");
+			
+			while (@config and $config[0] =~ /\A(check\w*)(?: (-\w(?:=\S+)?(?: -\w(?:=\S+)?)*))? (=.*=)\Z/) {
+				shift @config;
+				my $check_file = "$1.pl";
+				my %check_flags;
+				%check_flags = parse_flags($2) if defined $2;
+				my $break = $3;
+				warn "$check_file at work/$exercise/$check_file\n";
+				
+				my $prefix = "\n\n";
+				my $suffix = "\n\n";
+				my $contents = read_file_from_config(\@config, $break);
+				
+				$prefix .= "my %tests;\n" if $check_flags{t};
+				$suffix .= "
+					my \$errors = 0;
+					foreach my \$test (sort keys \%tests) {
+						\$output = `\$test`;
+						\$expected = \$tests{\$test};
+						if (\$output ne \$expected) {
+							say \"!!!! ERROR in work/$exercise/$check_file: '\$output'\";
+							say \"!!!! EXPECTED: '\$expected'\" if defined \$expected;
+							\$errors++;
+						}
+						# else { say \"debug good: \$output\"; }
+					}
+					if (\$errors == 0) {
+						say 'work/$exercise/$check_file good!';
+					}
+				" if $check_flags{t};
+
+				$suffix .= "
+if (\$output eq \$expected) {
+	say 'work/$exercise/$check_file good!';
+} else {
+	say \"!!!! ERROR in work/$exercise/$check_file: '\$output'\";
+	say \"!!!! EXPECTED: '\$expected'\" if defined \$expected;
+}
+" if $check_flags{e};
+				
+				dump_file("work/$exercise/$check_file", "#!/usr/bin/env perl
+use strict;
+use warnings;
+use feature 'say';
+
+my \$program = './work/$exercise/$program_name';
+my \$output;
+my \$expected;
+
+$prefix
+$contents
+$suffix
+");
+				append_file('tools/check_all.sh', "
+					perl work/$exercise/$check_file
+				");
+			}
+
+		} else {
+
 		my ($function_name, $function_proto) = parse_function_ref($function);
 		
 		warn "\npreparing $exercise/$function_name\n";
@@ -248,6 +332,7 @@ $suffix
 perl work/$exercise/$check_file
 ");
 			}
+		}
 		}
 	}
 
