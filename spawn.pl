@@ -48,7 +48,7 @@ sub get_given_function_prototype {
 
 	my @protos = split /\r?\n/, $content;
 	foreach my $proto (@protos) {
-		if ($proto =~ /\A\S+\s+\**(\w+)\(.*\);?\Z/) {
+		if ($proto =~ /\A.+\s+\**(\w+)\(.*\);?\Z/) {
 			return $proto if $1 eq $function;
 		}
 	}
@@ -132,10 +132,10 @@ sub main {
 		my $exercise = $thing;
 		my $function = shift @config;
 
-		warn "\npreparing $exercise/$function\n";
-
 		my ($function_name, $function_proto) = parse_function_ref($function);
 		
+		warn "\npreparing $exercise/$function_name\n";
+
 		unless (-e -d "$project_directory/$exercise") {
 			warn "missing directory $project_directory/$exercise, skipping...";
 			next;
