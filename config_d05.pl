@@ -36,14 +36,18 @@ $expected = '-2147483648';
 
 ex02
 int ft_atoi(char *str)
-main -p -m ====
+main_basic -p -m ====
 $code = 'int res; int exp;';
 my @tests = qw/ 0 15 -25 12345 987654321 -34567 2147483647 -2147483648 /;
 foreach (@tests) {
 	$code .= "res = ft_atoi(\"$_\"), exp = $_;\n";
 	$code .= "printf(\"ft_atoi('$_') ($_ vs %d) -> %d\\n\", res, res == exp);\n";
 }
-==== check -l=6 ====
+==== check_basic -l=6 ====
+==== main_junk -m ====
+TEST(ft_atoi("\t\n\v\f\r +256"), 256);
+TEST(ft_atoi("256a99999"), 256);
+==== check_jump -l=2 ====
 ====
 
 
