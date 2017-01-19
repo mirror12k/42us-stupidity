@@ -136,6 +136,70 @@ $expected = "\n\n";
 ====
 
 
+ex05
+void ft_print_words_tables(char **tab)
+main_basic -m ====
+char* table[] = {"asdf","qwerty","zxcv", NULL};
+ft_print_words_tables(table);
+==== check_basic -e ====
+$expected = 'asdf
+qwerty
+zxcv
+';
+==== main_empty -m ====
+char* table[] = {NULL};
+ft_print_words_tables(table);
+==== check_empty -e ====
+$expected = '';
+====
+
+
+ex06
+char* ft_convert_base(char* nbr, char* base_from, char* base_to)
+main -m ====
+TEST_STR(ft_convert_base("15", "0123456789", "01"), "1111");
+TEST_STR(ft_convert_base("10000", "01", "0123456789"), "16");
+TEST_STR(ft_convert_base("-31", "0123456789", "0123456789abcdef"), "-1f");
+TEST_STR(ft_convert_base("+1f", "0123456789abcdef", "0123456789"), "31");
+TEST_STR(ft_convert_base("0", "0123456789", "0123456789abcdef"), "0");
+TEST_STR(ft_convert_base("0.1234567", "0123456789", "0123456789"), "0");
+TEST_STR(ft_convert_base("2147483647", "0123456789", "0123456789abcdef"), "7fffffff");
+TEST_STR(ft_convert_base("-80000000", "0123456789abcdef", "0123456789"), "-2147483648");
+==== check -l=8 ====
+====
+
+
+ex07
+char** ft_split(char *str, char *charset)
+main_basic -m ====
+char** res;
+for (res = ft_split("asdf qwerty zxcv", " "); *res != 0; res++)
+	printf("'%s',", *res);
+printf("\n");
+for (res = ft_split("s1_s2___++++___s3", "_+"); *res != 0; res++)
+	printf("'%s',", *res);
+printf("\n");
+==== check_basic -e ====
+$expected = "'asdf','qwerty','zxcv',
+'s1','s2','s3',
+";
+==== main_junk -m ====
+char** res;
+for (res = ft_split("++++lol_+_+hi____++++___", "_+"); *res != 0; res++)
+	printf("'%s',", *res);
+==== check_junk -e ====
+$expected = "'lol','hi',";
+==== main_less -m ====
+char** res;
+for (res = ft_split("NOPENOPENOPE", "NOPE"); *res != 0; res++)
+	printf("'%s',", *res);
+printf("\n");
+for (res = ft_split("", "NOPE"); *res != 0; res++)
+	printf("'%s',", *res);
+printf("\n");
+==== check_less -e ====
+$expected = "\n\n";
+====
 
 
 
