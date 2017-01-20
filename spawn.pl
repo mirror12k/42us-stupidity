@@ -295,6 +295,7 @@ sub main {
 			
 			foreach my $file (@exercise_files) {
 				warn "mirroring into work/$exercise/$file\n";
+				append_file('tools/verify.sh', " work/$exercise/$file") if $file =~ /\.[hc]\Z/;
 				mirror_file("$project_directory/$exercise/$file", "work/$exercise/$file");
 			}
 
