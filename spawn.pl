@@ -280,7 +280,6 @@ sub main {
 			warn "\npreparing $exercise\n";
 
 			my @exercise_files = map $exercise_flags{$_}, sort grep /\Af\d*\Z/, keys %exercise_flags;
-			say "debug: ", join ',', keys %exercise_flags;
 			unless (-e -d "$project_directory/$exercise") {
 				warn "missing directory $project_directory/$exercise, skipping...";
 				next;
@@ -295,6 +294,7 @@ sub main {
 			mkdir "work/$exercise";
 			
 			foreach my $file (@exercise_files) {
+				warn "mirroring into work/$exercise/$file\n";
 				mirror_file("$project_directory/$exercise/$file", "work/$exercise/$file");
 			}
 
@@ -309,17 +309,18 @@ sub main {
 				
 				my $spawn_contents = read_file_from_config(\@config, $break);
 				
-				say "debug spawn_type: $spawn_type";
+				my $file;
 				if ($spawn_type eq 'source') {
-					spawn_source_file($exercise, \%exercise_flags, $spawn_name, $spawn_contents, \%spawn_flags);
+					$file = spawn_source_file($exercise, \%exercise_flags, $spawn_name, $spawn_contents, \%spawn_flags);
 				} elsif ($spawn_type eq 'header') {
-					spawn_header_file($exercise, \%exercise_flags, $spawn_name, $spawn_contents, \%spawn_flags);
+					$file = spawn_header_file($exercise, \%exercise_flags, $spawn_name, $spawn_contents, \%spawn_flags);
 				} elsif ($spawn_type eq 'main') {
-					spawn_main_file($exercise, \%exercise_flags, $spawn_name, $spawn_contents, \%spawn_flags);
+					$file = spawn_main_file($exercise, \%exercise_flags, $spawn_name, $spawn_contents, \%spawn_flags);
 					$exercise_flags{__LAST_MAIN} = "work/$exercise/$spawn_name";
 				} else {
-					spawn_check_file($exercise, \%exercise_flags, $spawn_name, $spawn_contents, \%spawn_flags);
+					$file = spawn_check_file($exercise, \%exercise_flags, $spawn_name, $spawn_contents, \%spawn_flags);
 				}
+				warn "$spawn_name at $file\n";
 			}
 
 		} elsif ($exercise_flags{p}) {

@@ -34,15 +34,62 @@ $expected = "\n\n";
 
 ex01 -N -f=ft.h
 ft
-main ====
+source_mock_stuff ====
+#include <stdio.h>
+
+// this is already in stupidity.c
+/*void ft_putchar(char c)
+{
+	c++;
+	printf("ft_putchar\n");
+}*/
+void ft_putstr(char* str)
+{
+	str++;
+	printf("ft_putstr\n");
+}
+int ft_strcmp(char* s1, char* s2)
+{
+	s1++;
+	s2++;
+	printf("ft_strcmp\n");
+	return 0;
+}
+
+int ft_strlen(char* str)
+{
+	str++;
+	printf("ft_strlen\n");
+	return 0;
+}
+
+void ft_swap(int* a, int* b)
+{
+	a++;
+	b++;
+	printf("ft_swap\n");
+}
+
+
+
+==== main -f=mock_stuff.c ====
 #include "ft.h"
 #include <stdio.h>
 int main()
 {
-	printf("test!");
+	ft_putchar('\n');
+	ft_putstr(NULL);
+	ft_strcmp(NULL,NULL);
+	ft_strlen(NULL);
+	ft_swap(NULL,NULL);
 }
 ==== check -e ====
-$expected = 'test!';
+$expected = '
+ft_putstr
+ft_strcmp
+ft_strlen
+ft_swap
+';
 ====
 
 
@@ -220,7 +267,7 @@ int main(int argc, char** argv)
 
 ex06 -N -f1=ft_show_tab.c -f2=ft_stock_par.h
 show_tab
-main -f=ft_show_tab.c ====
+main_basic -f=ft_show_tab.c ====
 #include "ft_stock_par.h"
 void ft_show_tab(struct s_stock_par* par);
 int main()
@@ -229,20 +276,41 @@ int main()
 	char* words[] = {"lol","hijack", NULL};
 	stuff[0].size_param = 10;
 	stuff[0].str = "hello world!";
-	stuff[0].str = "hello world!";
+	stuff[0].copy = "hello world!";
 	stuff[0].tab = words;
 	
 	stuff[1].str = NULL;
 
 	ft_show_tab(stuff);
 }
-==== check -e ====
+==== check_basic -e ====
 $expected = 'hello world!
 10
 lol
 hijack
 ';
+==== main_empty -f=ft_show_tab.c ====
+#include "ft_stock_par.h"
+void ft_show_tab(struct s_stock_par* par);
+int main()
+{
+	t_stock_par stuff[2];
+	char* words[] = {NULL};
+	stuff[0].size_param = 0;
+	stuff[0].str = "";
+	stuff[0].copy = "";
+	stuff[0].tab = words;
+	
+	stuff[1].str = NULL;
+
+	ft_show_tab(stuff);
+}
+==== check_basic -e ====
+$expected = '
+0
+';
 ====
+
 
 
 
