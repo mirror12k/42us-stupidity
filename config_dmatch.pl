@@ -148,8 +148,14 @@ TEST(match("abcde", "a*e*c"), 0);
 TEST(match("abcde", "*d*c*"), 0);
 TEST(match("abcde", "a*d*d"), 0);
 
+TEST(match("*a", "*"), 1);
+TEST(match("**", "*"), 1);
+TEST(match("*ab", "*b"), 1);
+TEST(match("a*a", "a*"), 1);
+TEST(match("**a", "*a"), 1);
 
-==== check -l=120 ====
+
+==== check -l=125 ====
 ====
 
 
@@ -314,9 +320,14 @@ TEST(nmatch("test.asdf.c.bak", "*.*.*"), 3);
 TEST(nmatch("test.bak", "*.*.*"), 0);
 TEST(nmatch("", "************************"), 1);
 
+TEST(nmatch("*a", "*"), 1);
+TEST(nmatch("**", "*"), 1);
+TEST(nmatch("*ab", "*b"), 1);
+TEST(nmatch("a*a", "a*"), 1);
+TEST(nmatch("**a", "*a"), 1);
 
 
-==== check -l=125 ====
+==== check -l=130 ====
 ====
 
 
