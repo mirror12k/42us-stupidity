@@ -201,7 +201,7 @@ sub spawn_check_file {
 			my \$output = `\$test`;
 			my \$expected = \$tests{\$test};
 			if (\$output ne \$expected) {
-				say \"!!!! ERROR in work/$exercise/$main: '\$output'\";
+				say \"!!!! ERROR in work/$exercise/$main test `\$test`: '\$output'\";
 				say \"!!!! EXPECTED: '\$expected'\" if defined \$expected;
 				\$errors++;
 			}
@@ -367,7 +367,7 @@ sub main {
 						\$output = `\$test`;
 						\$expected = \$tests{\$test};
 						if (\$output ne \$expected) {
-							say \"!!!! ERROR in work/$exercise/$check_file: '\$output'\";
+							say \"!!!! ERROR in work/$exercise/$check_file test `\$test`: '\$output'\";
 							say \"!!!! EXPECTED: '\$expected'\" if defined \$expected;
 							\$errors++;
 						}
@@ -480,6 +480,11 @@ sub main {
 					my $prefix = "\n\n";
 					my $suffix = "\n\n";
 					my $contents = read_file_from_config(\@config, $break);
+
+					$prefix .= "
+						\$output = `\$program`;
+					" unless $check_flags{t};
+
 					$prefix .= "
 						my \$count_lines = 0;
 						my \$errors = 0;
@@ -506,13 +511,31 @@ sub main {
 							say \"!!!! EXPECTED: '\$expected'\" if defined \$expected;
 						}
 					" if $check_flags{e};
+				$prefix .= "my %tests;\n" if $check_flags{t};
+				$suffix .= "
+					my \$errors = 0;
+					foreach my \$test (sort keys \%tests) {
+						\$output = `\$test`;
+						\$expected = \$tests{\$test};
+						if (\$output ne \$expected) {
+							say \"!!!! ERROR in work/$exercise/$check_file test `\$test`: '\$output'\";
+							say \"!!!! EXPECTED: '\$expected'\" if defined \$expected;
+							\$errors++;
+						}
+						# else { say \"debug good: \$output\"; }
+					}
+					if (\$errors == 0) {
+						say 'work/$exercise/$check_file good!';
+					}
+				" if $check_flags{t};
 					
 					dump_file("work/$exercise/$check_file", "#!/usr/bin/env perl
 						use strict;
 						use warnings;
 						use feature 'say';
-
-						my \$output = `./work/$exercise/$main_file`;
+						
+						my \$program = './work/$exercise/$main_file';
+						my \$output;
 						my \$expected;
 						die \"$exercise/$main_file failed to run: \$?\" if \$?;
 
