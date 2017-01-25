@@ -201,14 +201,14 @@ sub spawn_check_file {
 			my \$output = `\$test`;
 			my \$expected = \$tests{\$test};
 			if (\$output ne \$expected) {
-				say \"!!!! ERROR in work/$exercise/$main test `\$test`: '\$output'\";
+				say \"!!!! ERROR in $main test `\$test`: '\$output'\";
 				say \"!!!! EXPECTED: '\$expected'\" if defined \$expected;
 				\$errors++;
 			}
 			# else { say \"debug good: \$output\"; }
 		}
 		if (\$errors == 0) {
-			say 'work/$exercise/$main good!';
+			say '$main good!';
 		}
 	" if $flags->{t};
 
