@@ -559,6 +559,397 @@ int main(int argc, char** argv)
 ====
 
 
+ex11 -N -f1=ft_list_find.c -f2=ft_list.h
+lol hi
+main -f=ft_list_find.c ====
+#include "ft_list.h"
+
+t_list *ft_list_find(t_list *begin_list, void *data_ref, int (*cmp)());
+
+t_list* ft_create_elem(void* data)
+{
+	t_list* item = malloc(sizeof(t_list));
+	item->next = NULL;
+	item->data = data;
+	return (item);
+}
+#define CE(data) ft_create_elem(data)
+#define CL(list) crap_a_list(list)
+
+// pronounced with an exclaimation point at the end
+void crap_a_list(t_list* list)
+{
+	for (; list != 0; list = list->next)
+		printf("%s,", (char*)list->data);
+	printf("\n");
+}
+
+// pronounced with an exclaimation point at the end
+t_list* crap_the_argv(char** argv)
+{
+	t_list* res = 0;
+	t_list* tail = 0;
+	argv++;
+	while (*argv != 0)
+	{
+		if (tail == 0)
+			res = tail = CE(*argv++);
+		else
+		{
+			tail->next = CE(*argv++);
+			tail = tail->next;
+		}
+	}
+	return res;
+}
+
+void print_str(char* str)
+{
+	printf("%s\n", str);
+}
+
+int starts_with(char* str, char* ref)
+{
+	return str[0] - ref[0];
+}
+
+int main(int argc, char** argv)
+{
+	if (argc < 1)
+		return 1;
+	t_list* list = crap_the_argv(argv);
+	t_list* res = ft_list_find(list, "a", (int(*)())starts_with);
+	if (res == 0)
+		printf("(NULL)");
+	else
+		printf("%s", (char*)res->data);
+}
+==== check -t ====
+%tests = (
+	"$program" => "(NULL)",
+	"$program asdf" => "asdf",
+	"$program qwer" => "(NULL)",
+	"$program qwer asdf zxcv" => "asdf",
+	"$program ''" => "(NULL)",
+	"$program uiop aaaaa qwer alpha zxcv asdf hjkl" => "aaaaa",
+	"$program wat atw taw awt twa" => "atw",
+);
+====
+
+
+
+
+
+
+ex12 -N -f1=ft_list_remove_if.c -f2=ft_list.h
+lol hi
+main -f=ft_list_remove_if.c ====
+#include "ft_list.h"
+
+void ft_list_remove_if(t_list **begin_list, void *data_ref, int (*cmp)());
+
+t_list* ft_create_elem(void* data)
+{
+	t_list* item = malloc(sizeof(t_list));
+	item->next = NULL;
+	item->data = data;
+	return (item);
+}
+#define CE(data) ft_create_elem(data)
+#define CL(list) crap_a_list(list)
+
+// pronounced with an exclaimation point at the end
+void crap_a_list(t_list* list)
+{
+	for (; list != 0; list = list->next)
+		printf("%s,", (char*)list->data);
+	printf("\n");
+}
+
+// pronounced with an exclaimation point at the end
+t_list* crap_the_argv(char** argv)
+{
+	t_list* res = 0;
+	t_list* tail = 0;
+	argv++;
+	while (*argv != 0)
+	{
+		if (tail == 0)
+			res = tail = CE(*argv++);
+		else
+		{
+			tail->next = CE(*argv++);
+			tail = tail->next;
+		}
+	}
+	return res;
+}
+
+void print_str(char* str)
+{
+	printf("%s\n", str);
+}
+
+int starts_with(char* str, char* ref)
+{
+	return str[0] - ref[0];
+}
+
+int main(int argc, char** argv)
+{
+	if (argc < 1)
+		return 1;
+	t_list* list = crap_the_argv(argv);
+	ft_list_remove_if(&list, "a", (int(*)())starts_with);
+	crap_a_list(list);
+}
+==== check -t ====
+%tests = (
+	"$program" => "\n",
+	"$program asdf" => "\n",
+	"$program qwer" => "qwer,\n",
+	"$program qwer asdf zxcv" => "qwer,zxcv,\n",
+	"$program ''" => ",\n",
+	"$program uiop aaaaa qwer alpha zxcv asdf hjkl" => "uiop,qwer,zxcv,hjkl,\n",
+	"$program wat atw taw awt twa" => "wat,taw,twa,\n",
+);
+====
+
+
+
+ex13 -N -f1=ft_list_merge.c -f2=ft_list.h
+lol hi
+main -f=ft_list_merge.c ====
+#include "ft_list.h"
+
+void ft_list_merge(t_list **begin_list1, t_list *begin_list2);
+
+t_list* ft_create_elem(void* data)
+{
+	t_list* item = malloc(sizeof(t_list));
+	item->next = NULL;
+	item->data = data;
+	return (item);
+}
+#define CE(data) ft_create_elem(data)
+#define CL(list) crap_a_list(list)
+
+// pronounced with an exclaimation point at the end
+void crap_a_list(t_list* list)
+{
+	for (; list != 0; list = list->next)
+		printf("%s,", (char*)list->data);
+	printf("\n");
+}
+
+// pronounced with an exclaimation point at the end
+t_list* crap_the_argv(char** argv)
+{
+	t_list* res = 0;
+	t_list* tail = 0;
+	argv++;
+	while (*argv != 0)
+	{
+		if (tail == 0)
+			res = tail = CE(*argv++);
+		else
+		{
+			tail->next = CE(*argv++);
+			tail = tail->next;
+		}
+	}
+	return res;
+}
+
+void print_str(char* str)
+{
+	printf("%s\n", str);
+}
+
+int starts_with(char* str, char* ref)
+{
+	return str[0] - ref[0];
+}
+
+int main(int argc, char** argv)
+{
+	if (argc < 1)
+		return 1;
+	t_list* initial_list = 0;
+	t_list* list = crap_the_argv(argv);
+	ft_list_merge(&initial_list, list);
+	crap_a_list(initial_list);
+
+
+	initial_list = CE("first");
+	initial_list->next = CE("second");
+	list = crap_the_argv(argv);
+	ft_list_merge(&initial_list, list);
+	crap_a_list(initial_list);
+}
+==== check -t ====
+%tests = (
+	"$program" => "\nfirst,second,\n",
+	"$program asdf" => "asdf,\nfirst,second,asdf,\n",
+	"$program qwer asdf zxcv" => "qwer,asdf,zxcv,\nfirst,second,qwer,asdf,zxcv,\n",
+);
+====
+
+
+
+ex14 -N -f1=ft_list_sort.c -f2=ft_list.h
+lol hi
+main -f=ft_list_sort.c ====
+#include "ft_list.h"
+
+void ft_list_sort(t_list **begin_list, int (*cmp)());
+
+t_list* ft_create_elem(void* data)
+{
+	t_list* item = malloc(sizeof(t_list));
+	item->next = NULL;
+	item->data = data;
+	return (item);
+}
+#define CE(data) ft_create_elem(data)
+#define CL(list) crap_a_list(list)
+
+// pronounced with an exclaimation point at the end
+void crap_a_list(t_list* list)
+{
+	for (; list != 0; list = list->next)
+		printf("%s,", (char*)list->data);
+	printf("\n");
+}
+
+// pronounced with an exclaimation point at the end
+t_list* crap_the_argv(char** argv)
+{
+	t_list* res = 0;
+	t_list* tail = 0;
+	argv++;
+	while (*argv != 0)
+	{
+		if (tail == 0)
+			res = tail = CE(*argv++);
+		else
+		{
+			tail->next = CE(*argv++);
+			tail = tail->next;
+		}
+	}
+	return res;
+}
+
+void print_str(char* str)
+{
+	printf("%s\n", str);
+}
+
+int starts_with(char* str, char* ref)
+{
+	return str[0] - ref[0];
+}
+
+int main(int argc, char** argv)
+{
+	if (argc < 1)
+		return 1;
+	t_list* list = crap_the_argv(argv);
+	ft_list_sort(&list, (int(*)())strcmp);
+	crap_a_list(list);
+}
+==== check -t ====
+%tests = (
+	"$program" => "\n",
+	"$program asdf" => "asdf,\n",
+	"$program asdf zxcv" => "asdf,zxcv,\n",
+	"$program zxcv asdf" => "asdf,zxcv,\n",
+	"$program qwer asdf zxcv" => "asdf,qwer,zxcv,\n",
+	"$program zxcv asdf qwer" => "asdf,qwer,zxcv,\n",
+	"$program zxcv qwer asdf" => "asdf,qwer,zxcv,\n",
+	"$program qwer zxcv asdf" => "asdf,qwer,zxcv,\n",
+	"$program asdf qwer zxcv" => "asdf,qwer,zxcv,\n",
+	"$program zxcv doop qwer asdf uiop hjkl vbnm" => "asdf,doop,hjkl,qwer,uiop,vbnm,zxcv,\n",
+);
+====
+
+
+
+ex15 -N -f1=ft_list_reverse_fun.c -f2=ft_list.h
+lol hi
+main -f=ft_list_reverse_fun.c ====
+#include "ft_list.h"
+
+void ft_list_reverse_fun(t_list *begin_list);
+
+t_list* ft_create_elem(void* data)
+{
+	t_list* item = malloc(sizeof(t_list));
+	item->next = NULL;
+	item->data = data;
+	return (item);
+}
+#define CE(data) ft_create_elem(data)
+#define CL(list) crap_a_list(list)
+
+// pronounced with an exclaimation point at the end
+void crap_a_list(t_list* list)
+{
+	for (; list != 0; list = list->next)
+		printf("%s,", (char*)list->data);
+	printf("\n");
+}
+
+// pronounced with an exclaimation point at the end
+t_list* crap_the_argv(char** argv)
+{
+	t_list* res = 0;
+	t_list* tail = 0;
+	argv++;
+	while (*argv != 0)
+	{
+		if (tail == 0)
+			res = tail = CE(*argv++);
+		else
+		{
+			tail->next = CE(*argv++);
+			tail = tail->next;
+		}
+	}
+	return res;
+}
+
+void print_str(char* str)
+{
+	printf("%s\n", str);
+}
+
+int starts_with(char* str, char* ref)
+{
+	return str[0] - ref[0];
+}
+
+int main(int argc, char** argv)
+{
+	if (argc < 1)
+		return 1;
+	t_list* list = crap_the_argv(argv);
+	ft_list_reverse_fun(list);
+	crap_a_list(list);
+}
+==== check -t ====
+%tests = (
+	"$program" => "\n",
+	"$program asdf" => "asdf,\n",
+	"$program asdf zxcv" => "zxcv,asdf,\n",
+	"$program zxcv asdf" => "asdf,zxcv,\n",
+	"$program asdf qwer zxcv" => "zxcv,qwer,asdf,\n",
+	"$program zxcv doop qwer asdf uiop hjkl vbnm" => "vbnm,hjkl,uiop,asdf,qwer,doop,zxcv,\n",
+);
+====
+
+
 
 
 
