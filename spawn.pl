@@ -164,7 +164,13 @@ sub spawn_main_file {
 sub spawn_check_file {
 	my ($exercise, $exercise_flags, $name, $contents, $flags) = @_;
 
-	my $main = $exercise_flags->{__LAST_MAIN} // die "check file specified without main!";
+
+	my $main;
+	if ($flags->{m}) {
+		$main = "work/$exercise/$flags->{m}";
+	} else {
+		$main = $exercise_flags->{__LAST_MAIN} // die "check file specified without main!";
+	}
 	my $prefix = "\n\n";
 	my $suffix = "\n\n";
 
@@ -232,6 +238,9 @@ sub spawn_check_file {
 		$contents
 		$suffix
 	");
+	append_file('tools/build.sh', "
+		cd work/$exercise; make; cd ../..;
+	");
 	append_file('tools/check_all.sh', "
 		perl work/$exercise/$name.pl
 	");
@@ -280,6 +289,7 @@ sub main {
 			warn "\npreparing $exercise\n";
 
 			my @exercise_files = map $exercise_flags{$_}, sort grep /\Af\d*\Z/, keys %exercise_flags;
+			my @exercise_globs = map $exercise_flags{$_}, sort grep /\AF\d*\Z/, keys %exercise_flags;
 			unless (-e -d "$project_directory/$exercise") {
 				warn "missing directory $project_directory/$exercise, skipping...";
 				next;
@@ -293,6 +303,14 @@ sub main {
 			
 			mkdir "work/$exercise";
 			
+			foreach my $glob (@exercise_globs) {
+				foreach my $file_path (<$project_directory/$exercise/$glob>) {
+					my $file = $file_path =~ s/\A.*\/([^\/]+)\Z/$1/r;
+					warn "mirroring into work/$exercise/$file\n";
+					append_file('tools/verify.sh', " work/$exercise/$file") if $file =~ /\.[hc]\Z/;
+					mirror_file("$file_path", "work/$exercise/$file");
+				}
+			}
 			foreach my $file (@exercise_files) {
 				warn "mirroring into work/$exercise/$file\n";
 				append_file('tools/verify.sh', " work/$exercise/$file") if $file =~ /\.[hc]\Z/;
