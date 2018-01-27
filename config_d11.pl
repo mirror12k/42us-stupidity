@@ -229,13 +229,13 @@ int main(int argc, char** argv)
 }
 ==== check -t ====
 %tests = (
-	"$program" => "\n",
-	"$program asdf" => "asdf,\n",
-	"$program asdf qwer" => "qwer,asdf,\n",
-	"$program asdf qwer zxcv" => "zxcv,qwer,asdf,\n",
-	"$program ''" => ",\n",
-	"$program 15 '' 25" => "25,,15,\n",
-	"$program wat" => "wat,\n",
+	"$program" => "$program,\n",
+	"$program asdf" => "$program,asdf,\n",
+	"$program asdf qwer" => "$program,qwer,asdf,\n",
+	"$program asdf qwer zxcv" => "$program,zxcv,qwer,asdf,\n",
+	"$program ''" => "$program,,\n",
+	"$program 15 '' 25" => "$program,25,,15,\n",
+	"$program wat" => "$program,wat,\n",
 );
 ====
 
