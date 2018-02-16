@@ -20,6 +20,8 @@ $expected = "1, 'asdf' vs 'asdf'
 ex01
 int* ft_range(int min, int max)
 main -m ====
+#include <stdint.h>
+#include <inttypes.h>
 int* res;
 int i;
 res = ft_range(5, 10);
@@ -38,7 +40,7 @@ for (i = 0; i < 1; i++)
 printf("\n");
 
 res = ft_range(10, 5);
-printf("%x\n", (unsigned int)res);
+printf("%" PRIxPTR "\n", (uintptr_t) res);
 ==== check -e ====
 $expected = '5,6,7,8,9,
 -20,-19,-18,-17,-16,
