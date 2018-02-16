@@ -57,6 +57,7 @@ int size;
 
 size = ft_ultimate_range(&res, 5, 10);
 printf("is_null? %d\n", res == NULL);
+printf("size is %i\n", size);
 for (i = 0; i < 5; i++)
 	printf("%d,", res[i]);
 printf("\n");
@@ -64,6 +65,7 @@ printf("\n");
 res = NULL;
 size = ft_ultimate_range(&res, -20, -17);
 printf("is_null? %d\n", res == NULL);
+printf("size is %i\n", size);
 for (i = 0; i < 3; i++)
 	printf("%d,", res[i]);
 printf("\n");
@@ -71,12 +73,16 @@ printf("\n");
 res = (int*)1;
 size = ft_ultimate_range(&res, 10, 5);
 printf("is_null? %d\n", res == NULL);
+printf("size is %i\n", size);
 ==== check -e ====
 $expected = 'is_null? 0
+size is 5
 5,6,7,8,9,
 is_null? 0
+size is 3
 -20,-19,-18,
 is_null? 1
+size is 0
 ';
 ====
 
