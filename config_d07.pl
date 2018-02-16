@@ -20,6 +20,8 @@ $expected = "1, 'asdf' vs 'asdf'
 ex01
 int* ft_range(int min, int max)
 main -m ====
+#include <stdint.h>
+#include <inttypes.h>
 int* res;
 int i;
 res = ft_range(5, 10);
@@ -38,7 +40,7 @@ for (i = 0; i < 1; i++)
 printf("\n");
 
 res = ft_range(10, 5);
-printf("%x\n", (unsigned int)res);
+printf("%" PRIxPTR "\n", (uintptr_t) res);
 ==== check -e ====
 $expected = '5,6,7,8,9,
 -20,-19,-18,-17,-16,
@@ -57,6 +59,7 @@ int size;
 
 size = ft_ultimate_range(&res, 5, 10);
 printf("is_null? %d\n", res == NULL);
+printf("size is %i\n", size);
 for (i = 0; i < 5; i++)
 	printf("%d,", res[i]);
 printf("\n");
@@ -64,6 +67,7 @@ printf("\n");
 res = NULL;
 size = ft_ultimate_range(&res, -20, -17);
 printf("is_null? %d\n", res == NULL);
+printf("size is %i\n", size);
 for (i = 0; i < 3; i++)
 	printf("%d,", res[i]);
 printf("\n");
@@ -71,12 +75,16 @@ printf("\n");
 res = (int*)1;
 size = ft_ultimate_range(&res, 10, 5);
 printf("is_null? %d\n", res == NULL);
+printf("size is %i\n", size);
 ==== check -e ====
 $expected = 'is_null? 0
+size is 5
 5,6,7,8,9,
 is_null? 0
+size is 3
 -20,-19,-18,
 is_null? 1
+size is 0
 ';
 ====
 

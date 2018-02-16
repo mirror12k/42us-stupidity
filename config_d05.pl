@@ -154,10 +154,12 @@ $expected = 'asdf qwerty zxcv';
 ex10
 char* ft_strcapitalize(char* str)
 main -m ====
-char str[] = "asdf qWeRtY ZXCV 100TIS";
+char str[] = "asdf qWeRtY ZXCV 100TIS\n";
 printf("%s", ft_strcapitalize(str));
+char str2[] = "asdf-qWeRtY ZXCV 100TIS";
+printf("%s", ft_strcapitalize(str2));
 ==== check -e ====
-$expected = 'Asdf Qwerty Zxcv 100tis';
+$expected = "Asdf Qwerty Zxcv 100tis\nAsdf-Qwerty Zxcv 100tis";
 ====
 
 ex11
