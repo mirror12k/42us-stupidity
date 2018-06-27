@@ -71,7 +71,7 @@ printf("%s\n", ft_strncpy(test1, "uiop", 5));
 printf("%s\n", ft_strncpy(test1, "qwerty", 4));
 printf("%s\n", ft_strncpy(test1, "z", 1));
 ==== check -e ====
-$expected = "uiop\nqwer\nzwer\n";
+$expected = "uiop\nqwer\nz\n";
 ====
 
 
