@@ -92,9 +92,7 @@ res = ft_recursive_power(5, 3), exp = 125;
 printf("5^3 (%d vs %d) -> %d\n", res, exp, res == exp);
 res = ft_recursive_power(3, 5), exp = 243;
 printf("3^5 (%d vs %d) -> %d\n", res, exp, res == exp);
-res = ft_recursive_power(2, 1000000), exp = -1;
-printf("2^1000000 (%d vs %d) -> %d\n", res, exp, 1);
-==== check -l=8 ====
+==== check -l=7 ====
 ====
 
 
