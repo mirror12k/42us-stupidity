@@ -1,7 +1,34 @@
 # 42 Stupidity
-A tool for quickly testing answers to the piscine questions
 
-## usage
-clone this repository, and then clone a student's work repo inside of this one. run ```./spawn.pl THEIR_WORK_REPO/ config<day>.pl``` (replace THEIR_WORK_REPO with the repo that you cloned, and config<day>.pl with the name of the config file that you wish to test (they are named by day, so d02 would be config_d02.pl)). the spawn script will create test files for all exercises that it finds present.
+A tool for quickly test solutions for the piscine exercises.
 
-after spawning, run ```./tools/build.sh``` to build their files with the provided main.c's. run ```./tools/verify.sh``` to have norminette verify all files. finally, run ```./tools/check_all.sh``` to perform all tests. good tests will simply state 'good', errors will be printed with big exclamation marks.
+## Usage
+ 
+1. Clone 42us-stupidity
+2. Go inside 42us-stupidity
+3. Clone a day's repo inside 42us-stupidity
+4. Run `./spawn.pl <day_repo> config_d<day_number>.pl`<br>
+    Replacing the placeholders! This will create the test files for all the exercises.
+5. Run `./tools/build.sh`<br>
+  Build the exercies' files with the provided main.c's.
+6. Run `./tools/verify.sh`<br>
+  This makes norminette verify all the files. (Only works from the iMacs in the labs.)
+7. Run `./tools/check_all.sh`<br>
+  This will perform every test. If tests pass then they will say `good` otherwise errors are printed on the terminal.
+  
+## Example workflow
+
+```
+$ git clone https://github.com/mirror12k/42us-stupidity.git stupidMoulinette
+...
+$ cd stupidMoulinette
+$ cp ~/Desktop/day03 day03
+$ ./spawn.pl day03 config_d03.pl
+...
+$ ./tools/build.sh
+...
+$ ./tools/verify.sh
+...
+$ ./tools/check_all.sh
+...
+```
